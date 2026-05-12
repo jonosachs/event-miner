@@ -1,14 +1,12 @@
 # Mail PAL
 
-Automated AI mail filter tool that extracts important events and action items from your inbox and creates calendar events for each, with one-click approval via Slack. Built to save time and reduce message fatigue. Perfect for parents facing an overload of child-related emails!
-
-Handing over to Claude Code now for documentation..
+Automated AI mail filter tool that extracts important events and action items from your inbox and creates calendar events for each, with one-click approval via Slack. Built to save time and reduce message fatigue.
 
 ## How it works
 
 1. **AWS EventBridge** triggers the `RunPipeline` Lambda daily at 9am UTC (8pm AEDT)
-2. **AWS Lambda: RunPipeline** fetches recent emails from configured Gmail labels, queries existing bot-created calendar events, uses Gemini to extract new events (skipping duplicates), and sends an approval message to Slack for each
-3. **Slack** presents approve/deny buttons — clicking approve triggers the `SlackHandler` Lambda via AWS API Gateway
+2. **AWS Lambda: RunPipeline** fetches recent emails from configured Gmail labels, queries existing bot-created calendar events and recently declined events, uses Gemini to extract new events (skipping duplicates), and sends an approval message to Slack for each
+3. **Slack** presents approve/decline buttons — clicking approve triggers the `SlackHandler` Lambda via AWS API Gateway
 4. **AWS Lambda: SlackHandler** validates the request, creates the Google Calendar event, and updates the Slack message
 
 ## Architecture
@@ -37,32 +35,32 @@ life-admin/
 ├── pyproject.toml                # dependencies
 ├── template.yaml                 # AWS SAM deployment config
 ├── samconfig.toml                # SAM deploy settings
-├── main.py                       # local entry point
-├── config.py                     # loads secrets from .env or Secrets Manager
-├── functions/
-│   ├── run_pipeline/
-│   │   └── pipeline.py           # EventBridge triggered Lambda
-│   └── slack_handler/
-│       └── handler.py            # API Gateway triggered Lambda
 ├── layers/
 │   └── dependencies/
 │       └── requirements.txt      # shared Lambda dependencies
-├── services/
-│   ├── gmail.py
-│   ├── gcal.py
-│   ├── gemini.py
-│   ├── slack.py                  # legacy webhook client (kept for reference)
-│   ├── slack_client.py           # Slack Web API client (send_msg, update_msg, build_slack_msg)
-│   ├── slack_response.py
-│   ├── credentials.py
-│   └── prompt.py
-├── models/
-│   └── event.py
+├── src/                          # application source code packaged into Lambda
+│   ├── main.py                   # local entry point
+│   ├── config.py                 # loads secrets from .env or Secrets Manager
+│   ├── functions/
+│   │   ├── run_pipeline/
+│   │   │   └── pipeline.py       # EventBridge triggered Lambda
+│   │   └── slack_handler/
+│   │       └── handler.py        # API Gateway triggered Lambda
+│   ├── models/
+│   │   └── event.py
+│   └── services/
+│       ├── credentials.py
+│       ├── declined_events.py
+│       ├── gcal.py
+│       ├── gemini.py
+│       ├── gmail.py
+│       ├── prompt.py
+│       └── slack_client.py       # Slack Web API client
 └── tests/
+    ├── test_declined_events.py
     ├── test_gcal.py
     ├── test_gemini.py
     ├── test_gmail.py
-    ├── test_slack.py
     ├── test_slack_client.py
     └── test_slack_handler.py
 ```
@@ -75,7 +73,7 @@ Local dev uses a `.env` file. Production secrets are stored in AWS Secrets Manag
 | ---------------------- | ------------------------------------------------- |
 | `GOOGLE_CLIENT_ID`     | Google OAuth client ID                            |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret                        |
-| `GOOGLE_REFRESH_TOKEN` | Obtained once via `services/google_quickstart.py` |
+| `GOOGLE_REFRESH_TOKEN` | Obtained once via `src/services/google_quickstart.py` |
 | `GOOGLE_API_KEY`       | Google API key                                    |
 | `GEMINI_API_KEY`       | Gemini API key                                    |
 | `EMAILS`               | Comma-separated attendee emails                   |
@@ -93,7 +91,7 @@ pip install -e .
 
 ```bash
 pip install -e ".[dev]"
-pytest
+PYTHONPATH=src pytest
 ```
 
 ### Deploy
@@ -102,3 +100,41 @@ pytest
 sam build
 sam deploy
 ```
+
+If `sam deploy` hangs and only function code has changed, update the two Lambda functions directly:
+
+```bash
+sam build
+
+SLACK_FUNCTION=$(aws cloudformation describe-stack-resource \
+  --stack-name life-admin \
+  --logical-resource-id SlackHandlerFunction \
+  --region ap-southeast-2 \
+  --query 'StackResourceDetail.PhysicalResourceId' \
+  --output text)
+
+RUN_PIPELINE_FUNCTION=$(aws cloudformation describe-stack-resource \
+  --stack-name life-admin \
+  --logical-resource-id RunPipelineFunction \
+  --region ap-southeast-2 \
+  --query 'StackResourceDetail.PhysicalResourceId' \
+  --output text)
+
+cd .aws-sam/build/SlackHandlerFunction
+zip -qr /tmp/slack-handler.zip .
+
+cd ../RunPipelineFunction
+zip -qr /tmp/run-pipeline.zip .
+
+aws lambda update-function-code \
+  --function-name "$SLACK_FUNCTION" \
+  --zip-file fileb:///tmp/slack-handler.zip \
+  --region ap-southeast-2
+
+aws lambda update-function-code \
+  --function-name "$RUN_PIPELINE_FUNCTION" \
+  --zip-file fileb:///tmp/run-pipeline.zip \
+  --region ap-southeast-2
+```
+
+Direct function upload does not update infrastructure, environment variables, IAM permissions, API Gateway, EventBridge, or the Lambda layer.
