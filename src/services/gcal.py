@@ -15,12 +15,12 @@ class Calendar:
         self.creds = get_credentials()
         self.service = service or build("calendar", "v3", credentials=self.creds)
 
-    def create_event(self, event: dict) -> str:
+    def create_event(self, e: dict) -> str:
         logger.info("📡 Creating event")
         try:
             event = (
                 self.service.events()
-                .insert(calendarId="primary", body=event, sendUpdates="externalOnly")
+                .insert(calendarId="primary", body=e, sendUpdates="externalOnly")
                 .execute()
             )
 

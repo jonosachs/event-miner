@@ -1,5 +1,5 @@
 from urllib.parse import parse_qs
-from services.gcal import Calendar
+from services.gcal import Calendar, build_schema
 from models.event import Event
 from config import load_secrets
 from services.slack_client import SlackClient
@@ -27,6 +27,7 @@ def lambda_handler(event, context):
     if not request_validated(event):
         return {"statusCode": 401, "body": "Authentication failed"}
 
+    ts = None
     try:
         # Send ack message to Slacks (required within 3 secs)
         # Requires unpacking event to get the respones url.
@@ -41,22 +42,24 @@ def lambda_handler(event, context):
     except Exception as e:
         logger.exception("⚠️ Error handling Slack event")
         # TODO: may fail before ts is defined
-        sc.update_msg(ts=ts, text=f"⚠️ SlackHandlerFunction: {e}.")
+        if ts:
+            sc.update_msg(ts=ts, text=f"⚠️ SlackHandlerFunction: {e}.")
         raise
 
 
-def handle_user_response(payload):
+def handle_user_response(payload: dict):
     ts = payload["message"]["ts"]
     actions = payload["actions"][0]
     action_id = actions["action_id"]
     value = actions["value"]
     event_obj = Event.model_validate_json(value)  # Returns validated Pydantic model.
 
-    logger.info(f"Recieved user response: {action_id}")
+    logger.info(f"ℹ️ Recieved user response: {action_id}")
 
     if action_id == "approve":
         gcal = Calendar()
-        gcal.create_event(event_obj)
+        e = build_schema(event_obj)
+        gcal.create_event(e)
         sc.update_msg(
             ts=ts, text=f"✅ event created: {event_obj.title} {event_obj.date}"
         )

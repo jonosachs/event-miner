@@ -1,7 +1,9 @@
+import pytest
 from services.gemini import Gemini
 from tests.mock_email import mock_email, mock_followup
 
 
+@pytest.mark.skip(reason="Calls actual API. Need to implement with MagicMock")
 def test_extract_events():
     gem = Gemini()
     event = gem.extract_events(
@@ -12,6 +14,7 @@ def test_extract_events():
     assert "26" in event[0].start
 
 
+@pytest.mark.skip(reason="Calls actual API. Need to implement with MagicMock")
 def test_no_recreate_event():
     gem = Gemini()
     event = gem.extract_events(

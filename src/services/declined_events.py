@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from json.decoder import JSONDecodeError
 import boto3
 from models.event import Event
 from botocore.exceptions import ClientError
@@ -25,6 +24,8 @@ class Declined:
         # expiry used with Dynamo's Time to Live (TTL) which auto deletes expired entries
         expiry = int((datetime.now() + timedelta(days=5)).timestamp())
 
+        logger.info("📡 Adding entry to db")
+
         try:
             self.table.put_item(
                 Item={
@@ -44,6 +45,8 @@ class Declined:
             raise
 
     def get_all(self):
+        logger.info("📡 Getting db entries")
+
         try:
             response = self.table.scan()
             items = response.get("Items", [])
@@ -58,6 +61,8 @@ class Declined:
             raise
 
     def delete(self, id):
+        logger.info("📡 Deleting db entry")
+
         try:
             self.table.delete_item(Key={"id": id})
         except ClientError as err:

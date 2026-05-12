@@ -1,3 +1,4 @@
+import pytest
 from functions.slack_handler.handler import lambda_handler
 from tests.mock_slack_event import mock_event
 from datetime import datetime
@@ -7,6 +8,7 @@ import json
 logging.basicConfig(level=logging.DEBUG)
 
 
+@pytest.mark.skip(reason="Uses actual service. Need to implement with MagicMock")
 def test_slack_handler():
     me = mock_event
     ts = str(int(datetime.now().timestamp()))

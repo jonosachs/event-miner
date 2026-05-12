@@ -13,3 +13,7 @@ event.txt
 mock_event.json
 mock_slack_event.*
 tests/reports/
+.pytest_cache/
+.ruff_cache/
+.claude/
+

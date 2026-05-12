@@ -2,7 +2,7 @@ from services.gmail import Gmail
 from services.gemini import Gemini
 from services.gcal import Calendar
 from services.slack_client import build_slack_msg, SlackClient
-from services.db import Declined
+from services.declined_events import Declined
 import logging
 
 logger = logging.getLogger(__name__)

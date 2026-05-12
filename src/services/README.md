@@ -51,3 +51,12 @@ Docs:
 - https://docs.aws.amazon.com/boto3/latest/guide/quickstart.html
 - https://docs.aws.amazon.com/code-library/latest/ug/python_3_dynamodb_code_examples.html
 
+**put_item**
+- https://docs.aws.amazon.com/boto3/latest/reference/services/dynamodb/client/put_item.html#
+
+**get_item**
+- https://docs.aws.amazon.com/boto3/latest/reference/services/dynamodb/client/get_item.html
+
+**scan** - to retrieve all entries
+- https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html
+- https://docs.aws.amazon.com/boto3/latest/reference/services/dynamodb/client/scan.html
