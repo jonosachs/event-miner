@@ -45,11 +45,22 @@ response:
 Verify incoming requests from Slack
 - https://docs.slack.dev/authentication/verifying-requests-from-slack
 
+## AWS Serverless Application Model (AWS SAM)
+
+SAM policy templates:
+- https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html
+
 ## Dynamodb
 
-Docs:
+Code examples:
 - https://docs.aws.amazon.com/boto3/latest/guide/quickstart.html
 - https://docs.aws.amazon.com/code-library/latest/ug/python_3_dynamodb_code_examples.html
+
+CloudFormation DynamoDB table:
+- https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-dynamodb-table.html#aws-resource-dynamodb-table-syntax
+
+SAM DynamoDB Policy Templates
+- https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-templates.html#serverless-policy-template-table
 
 **put_item**
 - https://docs.aws.amazon.com/boto3/latest/reference/services/dynamodb/client/put_item.html#

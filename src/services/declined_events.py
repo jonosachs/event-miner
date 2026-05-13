@@ -42,7 +42,6 @@ class Declined:
                 err.response["Error"]["Code"],
                 err.response["Error"]["Message"],
             )
-            raise
 
     def get_all(self):
         logger.info("📡 Getting db entries")
@@ -58,7 +57,6 @@ class Declined:
                 err.response["Error"]["Code"],
                 err.response["Error"]["Message"],
             )
-            raise
 
     def delete(self, id):
         logger.info("📡 Deleting db entry")
@@ -73,4 +71,3 @@ class Declined:
                 err.response["Error"]["Code"],
                 err.response["Error"]["Message"],
             )
-            raise

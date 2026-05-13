@@ -1,6 +1,7 @@
 from urllib.parse import parse_qs
-from services.gcal import Calendar, build_schema
+from services.gcal import Calendar
 from models.event import Event
+from services.declined_events import Declined
 from config import load_secrets
 from services.slack_client import SlackClient
 import hmac
@@ -11,6 +12,7 @@ import time
 
 logger = logging.getLogger(__name__)
 sc = SlackClient()
+db = Declined()
 
 
 def ok(msg: str = ""):
@@ -66,11 +68,15 @@ def handle_user_response(payload: dict):
         logger.info(success_msg)
         return ok(success_msg)
     else:
+        # Write declined event to db
+        db.add(event_obj)
+
         declined_msg = "❌ Calendar event declined"
         sc.update_msg(
             ts=ts, text=f"❌ Event declined: {event_obj.title} {event_obj.date}"
         )
         logger.info(declined_msg)
+
         return ok(declined_msg)
 
 
