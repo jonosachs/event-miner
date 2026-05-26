@@ -4,16 +4,16 @@ Automated AI mail filter tool that extracts important events and action items fr
 
 ## How it works
 
-1. **AWS EventBridge** triggers the `RunPipeline` Lambda daily at 9am UTC (8pm AEDT)
-2. **AWS Lambda: RunPipeline** fetches recent emails from configured Gmail labels, queries existing bot-created calendar events and recently declined events, uses Gemini to extract new events (skipping duplicates), and sends an approval message to Slack for each
-3. **Slack** presents approve/decline buttons — clicking approve triggers the `SlackHandler` Lambda via AWS API Gateway
-4. **AWS Lambda: SlackHandler** validates the request, creates the Google Calendar event, and updates the Slack message
+1. **AWS EventBridge** triggers the `RunPipelineFunction` Lambda daily
+2. **RunPipelineFunction** fetches recent Gmail messages, checks existing and recently declined events, asks Gemini to extract new event candidates, and sends each candidate to Slack for review
+3. **Slack** presents approve/decline buttons, then sends the user interaction to `SlackHandlerFunction` via API Gateway
+4. **SlackHandlerFunction** validates the Slack request, parses the user decision, creates approved calendar events, stores declined events, and updates Slack
 
 ## Architecture
 
 ```
-AWS EventBridge (daily cron, UTC)
-    → AWS Lambda: RunPipeline
+AWS EventBridge (scheduled cron)
+    → AWS Lambda: RunPipelineFunction
         → Gmail API (fetch recent emails)
         → Google Calendar API (fetch existing bot-created events)
         → Gemini API (extract new events, skip duplicates)
@@ -21,8 +21,9 @@ AWS EventBridge (daily cron, UTC)
 
 Slack (button click)
     → AWS API Gateway
-        → AWS Lambda: SlackHandler
+        → AWS Lambda: SlackHandlerFunction
             → Google Calendar API (create event)
+            → DynamoDB (store declined events)
             → Slack (update message)
 ```
 
@@ -42,20 +43,31 @@ life-admin/
 │   ├── main.py                   # local entry point
 │   ├── config.py                 # loads secrets from .env or Secrets Manager
 │   ├── functions/
-│   │   ├── run_pipeline/
-│   │   │   └── pipeline.py       # EventBridge triggered Lambda
-│   │   └── slack_handler/
-│   │       └── handler.py        # API Gateway triggered Lambda
+│   │   ├── pipeline/
+│   │   │   └── handler.py        # EventBridge-triggered Lambda
+│   │   └── slack/
+│   │       └── handler.py        # API Gateway-triggered Lambda
 │   ├── models/
-│   │   └── event.py
+│   │   ├── event.py
+│   │   └── slack_action_payload.py
 │   └── services/
-│       ├── credentials.py
-│       ├── declined_events.py
-│       ├── gcal.py
-│       ├── gemini.py
-│       ├── gmail.py
-│       ├── prompt.py
-│       └── slack_client.py       # Slack Web API client
+│       ├── aws/
+│       │   └── db.py             # DynamoDB access
+│       ├── google/
+│       │   ├── credentials.py
+│       │   ├── gcal.py
+│       │   ├── gemini.py
+│       │   └── gmail.py
+│       ├── llm/
+│       │   ├── llm_base.py
+│       │   └── prompt.py
+│       ├── slack/
+│       │   ├── client.py         # Slack Web API client
+│       │   ├── event_review.py   # approve/decline workflow
+│       │   ├── msg_builder.py    # Slack Block Kit payloads
+│       │   ├── parser.py         # Slack payload parsing
+│       │   └── validator.py      # Slack request verification
+│       └── http_responses.py
 └── tests/
     ├── test_declined_events.py
     ├── test_gcal.py
@@ -73,7 +85,7 @@ Local dev uses a `.env` file. Production secrets are stored in AWS Secrets Manag
 | ---------------------- | ------------------------------------------------- |
 | `GOOGLE_CLIENT_ID`     | Google OAuth client ID                            |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret                        |
-| `GOOGLE_REFRESH_TOKEN` | Obtained once via `src/services/google_quickstart.py` |
+| `GOOGLE_REFRESH_TOKEN` | Obtained once via `src/services/google/google_quickstart.py` |
 | `GOOGLE_API_KEY`       | Google API key                                    |
 | `GEMINI_API_KEY`       | Gemini API key                                    |
 | `EMAILS`               | Comma-separated attendee emails                   |
