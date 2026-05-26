@@ -32,10 +32,8 @@ def build_review_msg(event: Event) -> list:
             "text": {
                 "type": "mrkdwn",
                 "text": f"""
-                📅 *{event.title}*
-                {event.from_} | {event.date} {event.time} | {event.duration_minutes} mins
-                {event.description}
-                {event.source_url}
+📅 *{event.title}*
+{event.from_} | {event.date} {event.time} | {event.duration_minutes} mins | {event.description} | {event.source_url}
                 """,
             },
         },
