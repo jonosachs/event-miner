@@ -1,8 +1,8 @@
-from src.services.slack.client import SlackClient
-from src.services.slack.parser import parse_slack_event
-import src.services.slack.validator as validator
-from src.services.slack.event_review import handle_user_action
-from src.services.http_responses import unauthorised
+from services.slack.client import SlackClient
+from services.slack.parser import parse_slack_event
+import services.slack.validator as validator
+from services.slack.event_review import handle_user_action
+from services.http_responses import unauthorised
 
 
 import logging

@@ -18,13 +18,13 @@ def test_connection():
 
 
 # Creates a mock message in Slack (need to delete manually)
-@pytest.mark.skip(reason="Uses actual service. Need to implement with MagicMock")
+# @pytest.mark.skip(reason="Uses actual service. Need to implement with MagicMock")
 def test_send_msg():
-    mock_client = MagicMock()
-    sc = SlackClient(client=mock_client)
+    # mock_client = MagicMock()
+    sc = SlackClient()
     e = mock_event
     msg_schema = build_review_msg(event=e)
-    response = sc.send_msg(msg_schema)
+    response = sc.send_new_msg(msg_schema)
     msg_response = json.loads(response["message"]["blocks"][1]["elements"][0]["value"])
 
     assert response.status_code == 200

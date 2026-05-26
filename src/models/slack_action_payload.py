@@ -1,6 +1,6 @@
 from pydantic import BaseModel
-from src.models.event import Event
-from src.services.slack.event_review import Action
+from models.event import Event
+from services.slack.event_review import Action
 
 
 class SlackActionPayload(BaseModel):
