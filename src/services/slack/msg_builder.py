@@ -1,4 +1,4 @@
-from src.models.event import Event
+from models.event import Event
 
 
 def build_static_msg(text: str) -> list:

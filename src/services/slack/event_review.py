@@ -1,7 +1,7 @@
-from src.services.aws.db import DeclinedEvents
-from src.services.slack.client import SlackClient
-from src.services.slack.msg_builder import build_static_msg, build_declined_msg
-from src.services.google.gcal import Calendar
+from services.aws.db import DeclinedEvents
+from services.slack.client import SlackClient
+from services.slack.msg_builder import build_static_msg, build_declined_msg
+from services.google.gcal import Calendar
 
 from enum import Enum
 import logging

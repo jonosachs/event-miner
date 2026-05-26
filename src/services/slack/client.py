@@ -1,5 +1,5 @@
 from config import load_secrets
-from src.services.slack.msg_builder import (
+from services.slack.msg_builder import (
     build_static_msg,
     build_declined_msg,
     build_review_msg,

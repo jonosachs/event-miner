@@ -1,18 +1,13 @@
 from config import load_secrets
-from src.models.slack_action_payload import SlackActionPayload
-from src.services.aws.db import DeclinedEvents
-from src.models.event import Event
-from src.services.slack.client import SlackClient
+from models.slack_action_payload import SlackActionPayload
+from models.event import Event
 
 from urllib.parse import parse_qs
 import json
 import logging
 
-
 logger = logging.getLogger(__name__)
 secrets = load_secrets()
-db = DeclinedEvents()
-slack = SlackClient()
 
 
 # Parse Slack event as dict and return SlackResponse object
