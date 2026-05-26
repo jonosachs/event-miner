@@ -6,8 +6,12 @@ from models.event import Event
 import logging
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from dotenv import load_dotenv
+import os
 
 logger = logging.getLogger(__name__)
+load_dotenv(override=True)
+APP_ENV = os.getenv("APP_ENV")
 
 
 class Calendar:
@@ -122,7 +126,7 @@ def build_schema(e: Event) -> dict:
         },
         "attendees": [
             {"email": EMAILS[0]},
-            {"email": EMAILS[1]},
+            # {"email": EMAILS[1]},
         ],
         "reminders": {
             "useDefault": True,
@@ -137,5 +141,8 @@ def build_schema(e: Event) -> dict:
     # Add recurrence tag only if data provided
     if e.recurrence:
         event["recurrence"] = e.recurrence
+
+    if APP_ENV == "prod":
+        event.attendees.append({"email": EMAILS[1]})
 
     return event

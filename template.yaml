@@ -8,6 +8,7 @@ Globals:
     Timeout: 60
     Environment:
       Variables:
+        APP_ENV: prod
         AWS_SECRETS_MAN: life-admin/secrets
         REGION: ap-southeast-2
         AWS_LAMBDA_LOG_LEVEL: INFO

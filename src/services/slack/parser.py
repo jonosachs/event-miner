@@ -23,9 +23,9 @@ def parse_slack_event(slack_event) -> SlackActionPayload:
 
     # Obtain event details
     action_id = payload["actions"][0]["action_id"]
-    event_raw = payload["actions"]["value"]
+    event_raw = payload["actions"][0]["value"]
     event = Event.model_validate_json(event_raw)  # Returns validated Pydantic model.
-    event_preview = f"{event.title} {event.data}"
+    event_preview = f"{event.title} {event.date}"
 
     return SlackActionPayload(
         ts=ts,
