@@ -24,6 +24,8 @@ class Calendar:
         logger.info("📡 Creating event")
 
         try:
+            # sendUpdates param controls who recieves email calendar invites (as opposed
+            # to direct event creation).
             event = (
                 self.service.events()
                 .insert(calendarId="primary", body=e, sendUpdates="externalOnly")
@@ -32,6 +34,8 @@ class Calendar:
 
             event_id = event["id"]
             logger.info(f"✅ Created event: {event_id}")
+
+            # TODO: return value not used
             return event_id
 
         except HttpError:
@@ -56,11 +60,13 @@ class Calendar:
             return event
 
         except HttpError:
-            logger.exception("Error getting event", extra={"event": event_id})
+            logger.exception("⚠️ Error getting event", extra={"event": event_id})
 
     def get_existing_events(self, query=None, max_results=None) -> list[dict] | None:
 
-        query = query or "[bot]"  # Existing bot created events are prepended with [bot]
+        # query param (q) accepts free text search terms
+        # Existing bot created events are prepended with [bot]
+        query = query or "[bot]"
         max_results = max_results or 10
 
         try:
@@ -90,6 +96,7 @@ class Calendar:
             logger.exception("⚠️ Error getting existing events")
             return
 
+    # TODO: Unused method
     def delete_event(self, event_id) -> None:
         try:
             response = (
@@ -111,11 +118,16 @@ def build_schema(e: Event) -> dict:
     secrets = load_secrets()
     EMAILS = secrets["EMAILS"].split(",")
 
+    # First email is dev
     attendees = [{"email": EMAILS[0]}]
+
+    # Add remaining recipients if in production
     APP_ENV = os.getenv("APP_ENV")
     if APP_ENV == "prod":
-        attendees.append({"email": EMAILS[1]})
+        for email in EMAILS[1:]:
+            attendees.append({"email": email})
 
+    # Google Calendar event schema
     event = {
         "summary": f"[bot] {e.title}",
         "location": e.location,

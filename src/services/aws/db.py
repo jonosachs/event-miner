@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class DeclinedEvents:
-    """Persist declined events to AWS Dynamodb"""
+    """Store declined events in database"""
 
     def __init__(self, resource=None, table=None):
         self.db = resource or boto3.resource("dynamodb")
@@ -25,9 +25,12 @@ class DeclinedEvents:
         # expiry used with Dynamo's Time to Live (TTL) which auto deletes expired entries
         expiry = int((datetime.now() + timedelta(days=5)).timestamp())
 
-        logger.info("📡 Adding entry to db")
+        logger.info("📡 Writing entry to db")
 
         try:
+            # Must use unique ID as the default event id (event.id_) uses the email id
+            # from which it was extracted, which causes conflicts when multiple events
+            # are extracted from a single email
             unique_id = str(uuid.uuid4())
 
             self.table.put_item(
@@ -39,6 +42,8 @@ class DeclinedEvents:
             )
             return unique_id
         except ClientError as err:
+            # DB expections do not raise as these errors are not terminal
+            # and can be picked up in the logs
             logger.error(
                 "⚠️ Couldn't add event %s to table %s. Here's why: %s: %s",
                 event,
@@ -62,6 +67,7 @@ class DeclinedEvents:
                 err.response["Error"]["Message"],
             )
 
+    # TODO: Unused method
     def get(self, id):
         logger.info("📡 Fetching db entry")
         try:

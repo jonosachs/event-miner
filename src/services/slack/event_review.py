@@ -41,10 +41,10 @@ def approve_event(payload):
 
 def decline_event(payload):
     # Write declined event to db and store id
-    db_id = db.add(payload.event)
-    payload.event.db_id = db_id
+    event_id = db.add(payload.event)
+    payload.event.db_id = event_id
 
-    # Send Slack confirmation msg
+    # Send Slack confirmation msg (includes undo button)
     slack_msg = build_declined_msg(
         f"❌ Event declined: {payload.event_preview}", payload.event
     )
@@ -54,9 +54,9 @@ def decline_event(payload):
 def undo_declined_event(payload):
     approve_event(payload)
 
-    # Delete database entry
-    db_id = payload.event.db_id
-    deleted = db.delete(db_id)
+    # Delete database entry. Use event.db_id, NOT event.id_
+    event_id = payload.event.db_id
+    deleted = db.delete(event_id)
 
     if deleted:
-        logger.info(f"Event {db_id} deleted from database")
+        logger.info(f"Event {event_id} deleted from database")

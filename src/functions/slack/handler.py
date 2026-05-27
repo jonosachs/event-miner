@@ -2,8 +2,7 @@ from services.slack.client import SlackClient
 from services.slack.parser import parse_slack_event
 import services.slack.validator as validator
 from services.slack.event_review import handle_user_action
-from services.http_responses import unauthorised
-
+from services.http_responses import unauthorised, ok
 
 import logging
 
@@ -28,6 +27,8 @@ def lambda_handler(event, context):
 
         # Handle approve/decline instruction from user
         handle_user_action(payload)
+
+        return ok("✅ Slack event processing complete")
 
     except Exception:
         logger.exception("⚠️ Error handling Slack event")

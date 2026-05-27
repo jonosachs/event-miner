@@ -22,6 +22,7 @@ def lambda_handler(_event, _context):
     """
 
     try:
+        # Get recent emails to search for possible events
         emails = gmail.get_mail()
 
         if not emails:
@@ -32,6 +33,7 @@ def lambda_handler(_event, _context):
         existing_events = cal.get_existing_events()
         declined_events = db.get_all()
 
+        # Extract possible events using llm
         payload = llm.extract_events(emails, existing_events, declined_events)
 
         if not payload.events:
@@ -39,6 +41,7 @@ def lambda_handler(_event, _context):
             slack.send_abort_msg(f"🛑 No new events: {reasons}")
             return ok("🛑 No new events")
 
+        # Send proposed events to Slack for user approval
         slack.send_events_for_approval(payload.events)
 
         return ok("✅ Pipeline complete")

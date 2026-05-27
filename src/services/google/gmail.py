@@ -62,7 +62,7 @@ class Gmail:
             query += f" {filter}"
 
         # Gmail uses 2-step process for msg retrieval
-        # 1- list() returns msg ids matching search query
+        # 1- .list() returns msg ids matching search query
         msg_ids = self.get_msg_ids(query=query, max_results=max_results)
 
         if not msg_ids or len(msg_ids) < 1:
@@ -71,7 +71,7 @@ class Gmail:
 
         logger.info(f"✅ Found {len(msg_ids)} msg ids matching search query")
 
-        # 2- get() returns an email matching the id
+        # 2- .get() returns an email matching the id
         messages = []
         for msg in msg_ids:
             msg_id = msg["id"]

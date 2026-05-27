@@ -3,6 +3,7 @@ from google.auth.transport.requests import Request
 from config import load_secrets
 
 
+# Credentials used for Google services
 def get_credentials():
     secrets = load_secrets()
 
