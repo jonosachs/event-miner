@@ -2,7 +2,6 @@ from services.aws.db import DeclinedEvents
 from services.slack.client import SlackClient
 from services.slack.msg_builder import (
     build_delete_original_payload,
-    build_response_payload,
     build_static_blocks,
     build_declined_blocks,
 )
