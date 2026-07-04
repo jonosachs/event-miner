@@ -17,7 +17,7 @@ class Gemini(LlmBase):
             self.secrets = load_secrets()
             self.client = client or genai.Client(api_key=self.secrets["GEMINI_API_KEY"])
 
-    def extract_events(self, emails, existing_events, declined_events) -> Events:
+    def extract_events(self, emails, existing_events, recent_events) -> Events:
 
         logger.info("📡 Contacting Gemini API..")
 
@@ -25,8 +25,8 @@ class Gemini(LlmBase):
         {prompt}
         Existing Events:
         {existing_events}
-        Recently Declined Events:
-        {declined_events}
+        Recently Created Events:
+        {recent_events}
         Emails:
         {emails}
         """

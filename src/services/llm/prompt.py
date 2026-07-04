@@ -1,5 +1,8 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from config import load_secrets
+
+secrets = load_secrets()
 
 local_dt = datetime.now(ZoneInfo("Australia/Melbourne")).isoformat()
 
@@ -8,6 +11,9 @@ prompt = f"""
   
   Your job is to filter the provided emails and find any important events, or actions items, and return calendar entries for each.
   You will also be provided with a list of existing events that you've extracted before, as well as a list of recently proposed events. Do not re-create these events.
+
+The following user-specified requirements must be observed:
+    {secrets["USER_SPECIFIC_PROMPT"]}
 
   Only include events that are important or actually require a response.
   Return a JSON array per the schema provided. 

@@ -19,6 +19,7 @@ KEYS = [
     "SLACK_SIGNING_SECRET",
     "SLACK_WEBHOOK_URL",
     "SLACK_BOT_USER_TOKEN",
+    "USER_SPECIFIC_PROMPT",
 ]
 
 # Only runs once when the module is first imported

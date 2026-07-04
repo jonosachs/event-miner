@@ -91,7 +91,7 @@ class Gmail:
 def build_default_query():
     addresses = secrets["EXTRACT_EVENTS_FROM_EMAILS"].split(",")
 
-    query = "newer_than:2d"
+    query = "newer_than:7d"
     query += " AND "
     # Gmail uses {query1 query2} notation to match one or more criteria
     query += "{"
