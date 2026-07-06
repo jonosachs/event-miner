@@ -5,7 +5,7 @@ Transform: AWS::Serverless-2016-10-31
 Globals:
   Function:
     Runtime: python3.13
-    Timeout: 60
+    Timeout: 420
     Environment:
       Variables:
         APP_ENV: prod
@@ -96,7 +96,8 @@ Resources:
           Type: Schedule
           Properties:
             Schedule: cron(0 9 * * ? *)
-
+            RetryPolicy:
+              MaximumRetryAttempts: 0
 Outputs:
   SlackHandlerUrl:
     Description: API Gateway URL for Slack interactions

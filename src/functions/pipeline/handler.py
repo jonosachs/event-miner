@@ -46,8 +46,10 @@ def lambda_handler(_event, _context):
 
         # Write proposed events to db
         for event in payload.events:
+            # Build the source email url from the event id
             source_url = f"https://mail.google.com/mail/u/0/#inbox/{event.id_}"
             event.source_url = source_url
+            # Write to db and pass the returned UUID id to the event object
             event_id = db.add(event)
             event.db_id = event_id
 
