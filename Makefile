@@ -24,10 +24,10 @@ validate:
 format:
 	uv run ruff format .
 
-# --use-container builds the layer inside an Amazon Linux image so pip downloads
-# Linux wheels (.whl) -install files that match the Lambda runtime (instead of macOS ones).
+	
+# Use 'sam build --use-container' to build the layer inside an Amazon Linux image 
 build: validate
-	sam build --use-container
+	sam build 
 
 deploy: build
 	sam deploy
