@@ -7,7 +7,6 @@ import base64
 import logging
 
 logger = logging.getLogger(__name__)
-secrets = load_secrets()
 
 
 class Gmail:
@@ -89,6 +88,7 @@ class Gmail:
 
 # Helper methods
 def build_default_query():
+    secrets = load_secrets()
     addresses = secrets["EXTRACT_EVENTS_FROM_EMAILS"].split(",")
 
     query = "newer_than:7d"

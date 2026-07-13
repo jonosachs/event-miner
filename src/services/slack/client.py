@@ -13,13 +13,17 @@ from slack_sdk.errors import SlackApiError
 import logging
 
 logger = logging.getLogger(__name__)
-secrets = load_secrets()
 
 
 class SlackClient:
     def __init__(self, client=None, channel=None):
-        self.client = client or WebClient(token=secrets["SLACK_BOT_USER_TOKEN"])
+        self.client = client or self.build_client
         self.channel = channel or "C0AMF67KHM4"
+
+    def build_client(self):
+        secrets = load_secrets()
+        client = WebClient(token=secrets["SLACK_BOT_USER_TOKEN"])
+        return client
 
     def send_new_msg(self, msg_blocks: list):
         try:

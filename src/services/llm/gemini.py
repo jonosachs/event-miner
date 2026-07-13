@@ -1,7 +1,7 @@
 from google import genai
 from models.event import Events
 from services.llm.llm_base import LlmBase
-from services.llm.prompt import prompt
+from services.llm.prompt import build_prompt
 from config import load_secrets
 from google.genai import errors, types
 import logging
@@ -27,7 +27,7 @@ class Gemini(LlmBase):
         logger.info("📡 Contacting Gemini API..")
 
         prompt_contents = f"""
-        {prompt}
+        {build_prompt}
         Existing Events:
         {existing_events}
         Recently Seen Events:

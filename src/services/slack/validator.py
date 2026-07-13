@@ -4,8 +4,6 @@ import hmac
 import hashlib
 import time
 
-secrets = load_secrets()
-
 
 @dataclass
 class ValidatorOutcome:
@@ -20,6 +18,7 @@ def validate(slack_event) -> ValidatorOutcome:
     """
 
     # Grab your Slack Signing Secret
+    secrets = load_secrets()
     slack_signing_secret = secrets["SLACK_SIGNING_SECRET"]
     # Use the raw request body, without headers, before it has been deserialized from JSON
     raw_body = slack_event["body"]
