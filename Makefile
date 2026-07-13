@@ -17,9 +17,10 @@ test-integration:
 
 lint:
 	uv run ruff check .
+	uv run ruff format --check .
 
 validate:
-	sam validate --lint
+	uv run cfn-lint template.yaml
 
 format:
 	uv run ruff format .

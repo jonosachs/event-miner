@@ -17,6 +17,7 @@ dependencies = [
 [dependency-groups]
 dev = [
   "boto3",
+  "cfn-lint",
   "google-auth-oauthlib",
   "pytest",
   "ruff"

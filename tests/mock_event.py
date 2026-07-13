@@ -14,4 +14,3 @@ mock_event = Event(
     confidence=1.0,
     source_url="http://www.gmail.com/",
 )
-
