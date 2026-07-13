@@ -11,7 +11,7 @@ scratch.py
 dynamo.py
 event.txt
 mock_event.json
-mock_slack_event.*
+mock_slack_event.json
 tests/reports/
 .pytest_cache/
 .ruff_cache/
