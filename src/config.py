@@ -36,13 +36,18 @@ def load_secrets():
         is_lambda = os.getenv("AWS_LAMBDA_FUNCTION_NAME")
 
         if is_lambda:
-            _secrets = get_secrets_fromAWS()
+            _secrets = get_secrets_from_aws()
         else:
             _secrets = get_secrets_locally()
 
+    missing = []
     for key, value in _secrets.items():
         if not value:
             logger.error(f"{key}: {'MISSING'}")
+            missing.append(key)
+
+    if len(missing) > 0:
+        raise ValueError(f"⚠️ Missing keys: {str(missing)}")
 
     return _secrets
 
@@ -54,7 +59,7 @@ def get_secrets_locally():
     return secrets
 
 
-def get_secrets_fromAWS():
+def get_secrets_from_aws():
     """Get secrets from AWS Secret Manager"""
 
     secret_name = os.getenv("AWS_SECRETS_MAN")
