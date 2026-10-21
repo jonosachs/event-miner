@@ -119,6 +119,7 @@ Resources:
           Type: Schedule
           Properties:
             Schedule: cron(0 9 * * ? *)
+            State: DISABLED
             RetryPolicy:
               MaximumRetryAttempts: 0
 Outputs:
